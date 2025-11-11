@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Audio Metadata Editor - Complete Version
+Audio Metadata Editor
 Supports FLAC, MP3, M4A, OGG, OPUS, WMA, and WAV formats.
-Includes Album Cover (option 1) with online/local selection and popup preview.
+
 """
 import os
 import sys
