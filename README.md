@@ -15,9 +15,9 @@ Includes album cover embedding and lyrics management (embed/rename).
 * Optional: musicbrainzngs (for online album cover search)
 
 Install dependencies via pip:
-
-```pip install mutagen pillow musicbrainzngs tk```
-
+```bash
+pip install mutagen pillow musicbrainzngs tk
+```
 Or via system package manager:
 
 * Fedora:
