@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 """
-Audio Metadata Editor - Complete Version
+Audio Metadata Editor - Adding Cover
 Supports FLAC, MP3, M4A, OGG, OPUS, WMA, and WAV formats.
-Includes Album Cover (option 1) with online/local selection and popup preview.
 """
-
 import os
 import sys
 import tempfile
@@ -30,11 +28,11 @@ except ImportError:
 
 # ===================== SETTINGS =====================
 AVAILABLE_TAGS = {
-    "1": "cover",       # Album cover is now option 1
-    "2": "artist",
-    "3": "albumartist",
+    "1": "cover",
+    "2": "title",
+    "3": "artist",
     "4": "album",
-    "5": "title",
+    "5": "albumartist",
     "6": "genre",
     "7": "date",
     "8": "tracknumber",
@@ -196,45 +194,96 @@ def display_metadata_analysis(metadata_map: Dict[str, Dict], tag: str, audio_fil
 
 # ===================== ALBUM COVER FUNCTIONS =====================
 def fetch_cover_musicbrainz(artist: str, album: str) -> Optional[str]:
+    """Fetch album cover from MusicBrainz and save to temp file."""
     try:
+        # Search for the release
         results = musicbrainzngs.search_releases(artist=artist, release=album, limit=1)
-        if not results['release-list']:
+        if not results.get('release-list'):
+            print("No releases found on MusicBrainz.")
             return None
+        
+        # Get the MusicBrainz ID
         mbid = results['release-list'][0]['id']
-        image_info = musicbrainzngs.get_image_list(mbid)
-        if not image_info['images']:
+        print(f"Found release: {results['release-list'][0].get('title', 'Unknown')}")
+        
+        # Get cover art
+        try:
+            image_info = musicbrainzngs.get_image_list(mbid)
+        except musicbrainzngs.ResponseError:
+            print("No cover art available for this release.")
             return None
+        
+        if not image_info.get('images'):
+            print("No images found in cover art archive.")
+            return None
+        
+        # Download the cover image
         image_url = image_info['images'][0]['image']
-        resp = requests.get(image_url)
+        print(f"Downloading cover from: {image_url}")
+        
+        resp = requests.get(image_url, timeout=10)
         if resp.status_code != 200:
+            print(f"Failed to download image. Status code: {resp.status_code}")
             return None
+        
+        # Save to temporary file
         temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".jpg")
         temp_file.write(resp.content)
         temp_file.close()
+        
+        print("Cover downloaded successfully!")
         return temp_file.name
-    except Exception:
+        
+    except Exception as e:
+        print(f"Error fetching cover: {e}")
         return None
 
 def show_image_popup(image_path: str):
-    img = Image.open(image_path).convert("RGB")  # Original image
+    img = Image.open(image_path).convert("RGB")
+    original_width, original_height = img.size
+    
+    # Smart scaling: fit to screen while maintaining aspect ratio
+    max_width = 1200
+    max_height = 900
+    
+    # Calculate scaling factor
+    scale_w = max_width / original_width if original_width > max_width else 1
+    scale_h = max_height / original_height if original_height > max_height else 1
+    scale = min(scale_w, scale_h)
+    
+    # Only downscale if image is too large
+    if scale < 1:
+        new_width = int(original_width * scale)
+        new_height = int(original_height * scale)
+        display_img = img.resize((new_width, new_height), Image.LANCZOS)
+    else:
+        display_img = img
+    
     root = tk.Tk()
-    root.title("Album Cover Preview")
-
-    # Create canvas with scrollbars
-    canvas = tk.Canvas(root, width=800, height=600)
+    root.title(f"Album Cover Preview - {original_width}x{original_height}px")
+    
+    # Window size adapts to image size (with padding)
+    window_width = min(display_img.width + 20, max_width)
+    window_height = min(display_img.height + 20, max_height)
+    
+    canvas = tk.Canvas(root, width=window_width, height=window_height)
     hbar = tk.Scrollbar(root, orient=tk.HORIZONTAL, command=canvas.xview)
     vbar = tk.Scrollbar(root, orient=tk.VERTICAL, command=canvas.yview)
     canvas.config(xscrollcommand=hbar.set, yscrollcommand=vbar.set)
-    hbar.pack(side=tk.BOTTOM, fill=tk.X)
-    vbar.pack(side=tk.RIGHT, fill=tk.Y)
+    
+    # Only show scrollbars if needed
+    if display_img.width > window_width:
+        hbar.pack(side=tk.BOTTOM, fill=tk.X)
+    if display_img.height > window_height:
+        vbar.pack(side=tk.RIGHT, fill=tk.Y)
+    
     canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-
-    # Place image on canvas
-    tk_img = ImageTk.PhotoImage(img)
+    
+    tk_img = ImageTk.PhotoImage(display_img)
     canvas.create_image(0, 0, anchor="nw", image=tk_img)
-    canvas.config(scrollregion=(0, 0, img.width, img.height))
-    canvas.image = tk_img  # Keep reference
-
+    canvas.config(scrollregion=(0, 0, display_img.width, display_img.height))
+    canvas.image = tk_img
+    
     root.update()
     return root, img
 
@@ -243,23 +292,28 @@ def process_album_cover(audio_folder: str):
     if not audio_files:
         print("No audio files found in the folder.")
         return
+    
     first_audio = load_audio_file(audio_files[0])
     album = get_tag_value(first_audio, 'album', audio_files[0]) or ""
     artist = get_tag_value(first_audio, 'artist', audio_files[0]) or ""
+    
     print(f"\nAlbum detected: {album}")
     print(f"Artist detected: {artist}\n")
     print("Choose album cover source:")
-    print("[1] Search online (MusicBrainz)")
-    print("[2] Provide local image file")
+    print("  [1] Search online (MusicBrainz)")
+    print("  [2] Provide local image file")
+    print("  [b] Back to setup menu")
     
     while True:
-        choice = input("Your choice [1/2]: ").strip()
-        if choice in ('1', '2'):
+        choice = input("\nYour choice: ").strip().lower()
+        if choice in ('1', '2', 'b'):
             break
-
+    
+    if choice == 'b':
+        return
+    
     cover_path = None
-
-    # Option 1: online search
+    
     if choice == '1':
         if 'musicbrainzngs' not in sys.modules:
             print("MusicBrainz module not available. Switching to local image.")
@@ -270,11 +324,12 @@ def process_album_cover(audio_folder: str):
             if not cover_path:
                 print("No online cover found. Switching to local image.")
                 choice = '2'
-
-    # Option 2: local image
+    
     if choice == '2':
         while True:
-            local_path = input("Enter local image path: ").strip()
+            local_path = input("Enter local image path (or 'b' to go back): ").strip()
+            if local_path.lower() == 'b':
+                return
             if os.path.exists(local_path) and os.path.isfile(local_path):
                 ext = os.path.splitext(local_path)[1].lower()
                 if ext in ('.jpg', '.jpeg', '.png', '.bmp', '.gif'):
@@ -284,35 +339,35 @@ def process_album_cover(audio_folder: str):
                     print("Unsupported image format. Try jpg/jpeg/png/bmp/gif.")
             else:
                 print("File not found. Try again.")
-
-    # Preview original image
+    
     root, img = show_image_popup(cover_path)
     img_size = os.path.getsize(cover_path)
     print(f"\nCover file: {cover_path}")
     print(f"Dimensions: {img.width}x{img.height}")
     print(f"Size: {img_size // 1024} KB")
+    
     while True:
         confirm = input("\nUse this cover? [y]es / [s]kip: ").strip().lower()
         if confirm in ('y', 's'):
             break
+    
     root.destroy()
+    
     if confirm == 's':
         print("Album cover embedding skipped.")
         return
-
-    # Convert only after confirmation
+    
     img = Image.open(cover_path).convert("RGB")
     img = img.resize((500, 500))
     converted_path = tempfile.NamedTemporaryFile(delete=False, suffix=".jpg").name
     img.save(converted_path, format="JPEG")
-
-    # Embed into all audio files
+    
     for fpath in audio_files:
         audio = load_audio_file(fpath)
         ext = os.path.splitext(fpath.lower())[1]
         with open(converted_path, 'rb') as imgfile:
             img_data = imgfile.read()
-
+        
         if ext == '.mp3':
             if not hasattr(audio, 'tags') or audio.tags is None:
                 audio.add_tags()
@@ -339,7 +394,7 @@ def process_album_cover(audio_folder: str):
             audio.clear_pictures()
             audio.add_picture(pic)
             audio.save()
-
+    
     print(f"Album cover embedded into {len(audio_files)} file(s).")
 
 # ===================== SETUP MENU =====================
@@ -347,36 +402,59 @@ def setup_menu(audio_files: List[str]) -> Tuple[List[str], Dict[str,str], List[s
     print("\n" + "=" * 60)
     print("Setup Menu - Select Metadata Fields to Edit")
     print("=" * 60)
-    for key, tag in sorted(AVAILABLE_TAGS.items()):
-        print(f"  [{key}] {tag.title()}")
-    print("\nInstructions: Enter numbers separated by spaces, e.g., 1 2 4")
+    print("\nAvailable Tags:")
+    print("  [1] Cover          [6] Genre")
+    print("  [2] Title          [7] Date")
+    print("  [3] Artist         [8] Track Number")
+    print("  [4] Album          [9] Disc Number")
+    print("  [5] Album Artist   [10] Comment")
+    print("\nInstructions: Enter numbers separated by spaces (e.g., 1 2 4)")
+    print("              Type 'b' to go back to main menu")
+    
     while True:
-        choices = input("\nYour selection: ").strip().split()
+        selection = input("\nYour selection: ").strip()
+        if selection.lower() == 'b':
+            return None, None, None
+        
+        choices = selection.split()
         selected_tags = [AVAILABLE_TAGS[c] for c in choices if c in AVAILABLE_TAGS]
         if selected_tags:
             break
         print("Error: No valid tags selected. Try again.")
+    
     global_values = {}
     per_file_tags = []
     metadata_map = analyze_metadata(audio_files, selected_tags)
+    
     for tag in selected_tags:
         if tag == 'cover':
             continue
+        
         display_metadata_analysis(metadata_map, tag, audio_files)
+        
         if tag in GLOBAL_TAGS:
-            print(f"\nOptions for {tag.title()}: [g]lobal / [i]ndividual / [s]kip")
+            print(f"\nOptions for {tag.title()}:")
+            print("  [g] Set global value for all files")
+            print("  [i] Edit individually per file")
+            print("  [s] Skip this tag")
+            print("  [b] Back to setup menu")
+            
             while True:
-                choice = input("Choice: ").strip().lower()
-                if choice in ('g','i','s'):
+                choice = input("\nYour choice: ").strip().lower()
+                if choice in ('g','i','s','b'):
                     break
-            if choice == 'g':
-                new_val = input(f"New {tag.title()} value: ").strip()
+            
+            if choice == 'b':
+                return None, None, None
+            elif choice == 'g':
+                new_val = input(f"Enter new {tag.title()} value: ").strip()
                 if new_val:
                     global_values[tag] = new_val
             elif choice == 'i':
                 per_file_tags.append(tag)
         else:
             per_file_tags.append(tag)
+    
     return selected_tags, global_values, per_file_tags
 
 # ===================== EDIT AUDIO FILES =====================
@@ -385,7 +463,7 @@ def edit_audio_files(audio_files: List[str], selected_tags: List[str],
     if not audio_files:
         print("\nNo audio files found.\n")
         return
-    # Apply global values
+    
     if global_values:
         for filepath in audio_files:
             audio = load_audio_file(filepath)
@@ -394,28 +472,39 @@ def edit_audio_files(audio_files: List[str], selected_tags: List[str],
             for tag, val in global_values.items():
                 set_tag_value(audio, tag, val, filepath)
             audio.save()
+    
     if not per_file_tags:
         print("\nNo per-file edits required. Done.")
         return
+    
     stats = {"processed":0,"skipped":0,"failed":0}
+    
     for idx, path in enumerate(audio_files, start=1):
         audio = load_audio_file(path)
         if audio is None:
             stats["failed"] += 1
             continue
+        
         filename = os.path.basename(path)
         print(f"\n[{idx}/{len(audio_files)}] File: {filename}")
         for tag in per_file_tags:
             current = get_tag_value(audio, tag, path)
             display_current = current if current else "[Not Set]"
             print(f"  {tag.title()}: {display_current}")
-        print("Options: [Enter] to edit | [s] skip | [q] quit")
-        action = input("Action: ").strip().lower()
+        
+        print("\nOptions:")
+        print("  [Enter] Edit this file")
+        print("  [s] Skip this file")
+        print("  [q] Quit and finish")
+        
+        action = input("\nYour choice: ").strip().lower()
+        
         if action == 'q':
             break
         elif action == 's':
             stats["skipped"] += 1
             continue
+        
         modified = False
         for tag in per_file_tags:
             current = get_tag_value(audio, tag, path)
@@ -424,12 +513,16 @@ def edit_audio_files(audio_files: List[str], selected_tags: List[str],
             if new_val:
                 set_tag_value(audio, tag, new_val, path)
                 modified = True
+        
         if modified:
             audio.save()
             stats["processed"] += 1
         else:
             stats["skipped"] += 1
-    print("\nBatch Operation Summary")
+    
+    print("\n" + "=" * 60)
+    print("Batch Operation Summary")
+    print("=" * 60)
     if global_values:
         print(f"  Global edits applied to {len(audio_files)} file(s)")
     print(f"  Per-file processed: {stats['processed']}")
@@ -438,24 +531,42 @@ def edit_audio_files(audio_files: List[str], selected_tags: List[str],
 
 # ===================== MAIN LOOP =====================
 def main_loop() -> None:
-    print("="*60)
+    print("=" * 60)
     print("Audio Metadata Editor - Complete Version")
-    print("="*60)
+    print("=" * 60)
+    
     while True:
-        print("\nEnter directory path to begin (or 0 to exit)")
-        directory = input("Directory: ").strip()
-        if directory == "0":
+        print("\n" + "=" * 60)
+        print("Main Menu")
+        print("=" * 60)
+        print("Enter directory path to begin")
+        print("Type 'e' to exit")
+        
+        directory = input("\nDirectory: ").strip()
+        
+        if directory.lower() == 'e':
+            print("Exiting...")
             break
+        
         if not directory:
             continue
+        
         audio_files = find_audio_files(directory)
         if not audio_files:
             print("No audio files found in folder.")
             continue
+        
         print(f"Found {len(audio_files)} audio file(s).")
-        selected_tags, global_values, per_file_tags = setup_menu(audio_files)
+        
+        result = setup_menu(audio_files)
+        if result == (None, None, None):
+            continue
+        
+        selected_tags, global_values, per_file_tags = result
+        
         if "cover" in selected_tags:
             process_album_cover(directory)
+        
         edit_audio_files(audio_files, selected_tags, global_values, per_file_tags)
 
 if __name__ == "__main__":
