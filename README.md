@@ -1,128 +1,129 @@
-# tagfix - Cli-Based Audio Batch Metadata Editor
+# TagFix 🎵
 
-A command-line and interactive tool for batch editing and organizing audio metadata.
-Supports FLAC, MP3, M4A, OGG, OPUS, WMA, and WAV formats using Mutagen.
-Includes album cover embedding and lyrics management (embed/rename).
+A modern, beautiful web-based audio metadata editor with Material You design.
 
----
+![TagFix Interface](https://via.placeholder.com/800x450/6750A4/FFFFFF?text=TagFix+Material+You+Interface)
 
-## Requirements
+## ✨ Features
 
-* Python 3.8 or later
-* Tkinter
-* Mutagen library
-* FFmpeg (for WAV conversion)
-* Pillow library (for album cover handling)
-* Optional: musicbrainzngs (for online album cover search)
+- 🎨 **Material You Design** - Beautiful, modern interface with light/dark mode
+- 🎵 **Metadata Editing** - Edit title, artist, album, genre, and more
+- 📝 **File Renaming** - Rename audio files directly from the UI
+- 🖼️ **Cover Art Management** - View, upload, and change album artwork
+- 🔄 **Format Conversion** - Convert audio files to WAV or FLAC
+- 📁 **Recursive Scanning** - Scan entire music libraries with nested folders
+- 🌙 **Dark Mode** - Toggle between light and dark themes
+- 🚀 **Fast & Lightweight** - Minimal dependencies, runs locally
 
-Install dependencies via pip:
+## 🎯 Supported Formats
+
+- MP3 (ID3v2)
+- FLAC (Vorbis Comments)
+- M4A/MP4 (iTunes-style)
+- WAV
+- OGG Vorbis
+
+## 📋 Requirements
+
+- **Python 3.7+**
+- **FFmpeg** (optional, for audio conversion)
+
+## 🚀 Quick Start
+
+### 1. Installation
+
 ```bash
-pip install mutagen pillow musicbrainzngs tk
-```
-Or via system package manager:
-
-* Fedora:
-  
-  ```bash
-  sudo dnf install python-mutagen python3-Pillow python-musicbrainzngs python3-tkinter
-
-* Arch Linux / Manjaro:
-  
-  ```bash
-  sudo pacman -S python-mutagen python-pillow python-musicbrainzngs tk
-
-* Debian / Ubuntu:
-  
-  ```bash
-  sudo apt install python3-mutagen python3-pil python-musicbrainzngs python3-tk
-  
-* Windows users just use ```pip```
-
-  
-
----
-
-## Usage
-Clone the repository and run the script:
-```bash
-git clone https://github.com/ext4zu/tagfix.git
+# Clone the repository
+git clone https://github.com/yourusername/tagfix.git
 cd tagfix
+
+# Install Python dependencies
+pip install -r requirements.txt
+
+# (Optional) Install FFmpeg for conversion features
+# Ubuntu/Debian:
+sudo apt install ffmpeg
+
+# Fedora:
+sudo dnf install ffmpeg
+
+# macOS:
+brew install ffmpeg
+```
+
+### 2. Run the Application
+
+**Web Interface:**
+```bash
+python3 app.py
+```
+Then open your browser to: **http://127.0.0.1:5000**
+
+**Command Line (Classic):**
+```bash
 python3 tagfix.py
 ```
 
-### Steps
+## 📖 Usage
 
-1. Enter the directory path containing your audio files or drag and drop the folder.
-2. Select which metadata fields to edit from the setup menu.
+1. **Enter a folder path** in the input field (e.g., `/home/user/Music`)
+2. **Click Scan** to load all audio files
+3. **Edit metadata** directly in the cards
+4. **Upload cover art** by clicking "Change Cover"
+5. **Rename files** using the filename field
+6. **Click Save All** to apply changes
+7. **Convert files** using the Convert button
 
-   * Includes: Cover, Lyrics, Title, Artist, Album, Album Artist, Genre, Date, Track Number, Disc Number, Comment.
-3. For each tag, choose between:
+## 🎨 Screenshots
 
-   * Global edits: Apply a single value to all files.
-   * Per-file edits: Manually enter values for each file.
-4. Album Cover Options:
+### Light Mode
+![Light Mode](https://via.placeholder.com/800x450/FFFBFE/1C1B1F?text=Light+Mode)
 
-   * Search online via MusicBrainz.
-   * Use a local image file (jpg, png, bmp, gif).
-5. Lyrics Options:
+### Dark Mode
+![Dark Mode](https://via.placeholder.com/800x450/1C1B1F/E6E1E5?text=Dark+Mode)
 
-   * Embed a lyrics file into audio metadata.
-   * Rename lyrics file to match song filename.
-   * Or do both.
-6. Confirm to begin batch editing.
+### Editing Metadata
+![Editing](https://via.placeholder.com/800x450/EADDFF/21005D?text=Metadata+Editing)
 
----
+## 🛠️ Technology Stack
 
-## Supported Tags
+- **Backend:** Flask (Python)
+- **Frontend:** Vanilla JavaScript, HTML5, CSS3
+- **Design:** Material Design 3 (Material You)
+- **Audio Processing:** Mutagen, FFmpeg
+- **Image Processing:** Pillow (PIL)
 
-| Number | Tag         | Description       |
-| ------ | ----------- | ----------------- |
-| 1      | cover       | Album cover image |
-| 2      | lyrics      | Song lyrics       |
-| 3      | title       | Track title       |
-| 4      | artist      | Artist name       |
-| 5      | album       | Album title       |
-| 6      | albumartist | Album artist      |
-| 7      | genre       | Music genre       |
-| 8      | date        | Release year/date |
-| 9      | tracknumber | Track number      |
-| 10     | discnumber  | Disc number       |
-| 11     | comment     | User comment      |
+## 📦 Dependencies
 
----
+```
+Flask>=3.0.0
+mutagen>=1.47.0
+Pillow>=10.0.0
+requests>=2.31.0
+```
 
-## Album Cover Handling
+## 🤝 Contributing
 
-* All embedded covers are resized to 500x500 px JPEG for compatibility with DAPs.
-* Supports online search via MusicBrainz (requires musicbrainzngs).
-* Supports local image files (jpg, jpeg, png, bmp, gif).
-* Images are previewed in a popup window before embedding.
-  
+Contributions are welcome! Feel free to:
 
----
+- Report bugs
+- Suggest new features
+- Submit pull requests
 
-## Lyrics Management
+## 📝 License
 
-* Can embed lyrics into audio metadata (supports .lrc or .txt files).
-* Can rename lyrics files to match audio filenames (again for DAPs).
-* Supports single or multiple files, with interactive selection.
-* Search function allows filtering lyrics files by song title.
+MIT License - See [LICENSE](LICENSE) file for details
 
----
+## 🙏 Acknowledgments
 
-## Notes
+- Material Design 3 by Google
+- Mutagen library for audio metadata handling
+- Flask framework for the web backend
 
-* Automatically detects and loads supported audio formats.
-* Invalid or unreadable files are skipped with a warning.
-* Global edits apply to all files for selected tags.
-* Per-file edits allow manual entry for each file individually.
-* You can cancel or skip files at any point during editing.
+## 📧 Contact
+
+For questions or support, please open an issue on GitHub.
 
 ---
 
-## Exit
-
-* Type e in the main menu to exit the application.
-* Press Ctrl + C anytime to stop safely.
-
----
+**Made with ❤️ and Material You**
