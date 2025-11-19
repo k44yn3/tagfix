@@ -4,18 +4,18 @@ A modern, beautiful web-based audio metadata editor with Material You design.
 
 ![TagFix Interface](https://via.placeholder.com/800x450/6750A4/FFFFFF?text=TagFix+Material+You+Interface)
 
-## ✨ Features
+## Features
 
-- 🎨 **Material You Design** - Beautiful, modern interface with light/dark mode
-- 🎵 **Metadata Editing** - Edit title, artist, album, genre, and more
-- 📝 **File Renaming** - Rename audio files directly from the UI
-- 🖼️ **Cover Art Management** - View, upload, and change album artwork
-- 🔄 **Format Conversion** - Convert audio files to WAV or FLAC
-- 📁 **Recursive Scanning** - Scan entire music libraries with nested folders
-- 🌙 **Dark Mode** - Toggle between light and dark themes
-- 🚀 **Fast & Lightweight** - Minimal dependencies, runs locally
+- **Material You Design** - Beautiful, modern interface with light/dark mode
+- **Metadata Editing** - Edit title, artist, album, genre, and more
+- **File Renaming** - Rename audio files directly from the UI
+- **Cover Art Management** - View, upload, and change album artwork
+- **Format Conversion** - Convert audio files to WAV or FLAC
+- **Recursive Scanning** - Scan entire music libraries with nested folders
+- **Dark Mode** - Toggle between light and dark themes
+- **Fast & Lightweight** - Minimal dependencies, runs locally
 
-## 🎯 Supported Formats
+## Supported Formats
 
 - MP3 (ID3v2)
 - FLAC (Vorbis Comments)
@@ -23,12 +23,12 @@ A modern, beautiful web-based audio metadata editor with Material You design.
 - WAV
 - OGG Vorbis
 
-## 📋 Requirements
+## Requirements
 
 - **Python 3.7+**
 - **FFmpeg** (optional, for audio conversion)
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Installation
 
@@ -74,7 +74,7 @@ python3 tagfix.py
 6. **Click Save All** to apply changes
 7. **Convert files** using the Convert button
 
-## 🎨 Screenshots
+## Screenshots
 
 ### Light Mode
 ![Light Mode](https://via.placeholder.com/800x450/FFFBFE/1C1B1F?text=Light+Mode)
@@ -85,7 +85,7 @@ python3 tagfix.py
 ### Editing Metadata
 ![Editing](https://via.placeholder.com/800x450/EADDFF/21005D?text=Metadata+Editing)
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 - **Backend:** Flask (Python)
 - **Frontend:** Vanilla JavaScript, HTML5, CSS3
@@ -93,7 +93,7 @@ python3 tagfix.py
 - **Audio Processing:** Mutagen, FFmpeg
 - **Image Processing:** Pillow (PIL)
 
-## 📦 Dependencies
+## Dependencies
 
 ```
 Flask>=3.0.0
@@ -102,7 +102,7 @@ Pillow>=10.0.0
 requests>=2.31.0
 ```
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Feel free to:
 
@@ -110,17 +110,17 @@ Contributions are welcome! Feel free to:
 - Suggest new features
 - Submit pull requests
 
-## 📝 License
+## License
 
 MIT License - See [LICENSE](LICENSE) file for details
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - Material Design 3 by Google
 - Mutagen library for audio metadata handling
 - Flask framework for the web backend
 
-## 📧 Contact
+## Contact
 
 For questions or support, please open an issue on GitHub.
 
