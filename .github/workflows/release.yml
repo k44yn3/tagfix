@@ -27,22 +27,13 @@ jobs:
             build_path: build/macos/Build/Products/Release/tagfix.app
 
     steps:
-
+    
       - uses: actions/checkout@v4
-
       - name: Install Flutter
         uses: subosito/flutter-action@v2
         with:
-          # Use a Flutter release that includes Dart >= 3.4.x so path_provider ^2.1.5 is satisfiable.
-          # Change this version if you prefer a different Flutter release that you know includes Dart 3.4+.
-          flutter-version: '3.16.6'
           channel: 'stable'
-
-      - name: Verify Flutter and Dart versions
-        run: |
-          flutter --version
-          dart --version
-
+          flutter-version: '3.16.6'
       - name: Install Linux dependencies
         if: matrix.target == 'linux'
         run: |
@@ -65,53 +56,27 @@ jobs:
       - name: Package ${{ matrix.target }} build
         working-directory: flutter_app
         run: |
-          # Ensure deterministic artifact path so upload steps can find it reliably
-          ARTIFACT_DIR="$GITHUB_WORKSPACE/flutter_app"
-          ARTIFACT_PATH="$ARTIFACT_DIR/${{ matrix.artifact_name }}"
-          mkdir -p "$ARTIFACT_DIR"
-
           case "${{ matrix.target }}" in
             linux)
-              cd "${{ matrix.build_path }}"
-              # zip contents into $GITHUB_WORKSPACE/flutter_app/<artifact>
-              zip -r "$ARTIFACT_PATH" .
+              cd ${{ matrix.build_path }}
+              zip -r ../../../../${{ matrix.artifact_name }} .
               ;;
             windows)
-              # Use PowerShell style Compress-Archive on windows runner and write to $Env:GITHUB_WORKSPACE/flutter_app
-              powershell -Command "
-                \$artifact = Join-Path \$Env:GITHUB_WORKSPACE 'flutter_app\\${{ matrix.artifact_name }}';
-                if (Test-Path \$artifact) { Remove-Item \$artifact -Force }
-                Compress-Archive -Path '${{ matrix.build_path }}\\*' -DestinationPath \$artifact -Force
-              "
+              # PowerShell is the default shell on windows‑latest runners
+              Compress-Archive -Path ${{ matrix.build_path }}\* -DestinationPath ${{ matrix.artifact_name }}
               ;;
             macos)
-              cd "${{ matrix.build_path }}"
-              zip -r "$ARTIFACT_PATH" tagfix.app
+              cd ${{ matrix.build_path }}
+              zip -r ../../../../${{ matrix.artifact_name }} tagfix.app
               ;;
           esac
 
-      - name: List packaged artifact
-        run: |
-          ls -la flutter_app || true
-          if [ -f "flutter_app/${{ matrix.artifact_name }}" ]; then
-            echo "Artifact exists: flutter_app/${{ matrix.artifact_name }}"
-          else
-            echo "ERROR: Artifact flutter_app/${{ matrix.artifact_name }} not found"
-            exit 1
-          fi
-
-      - name: Create GitHub Release and upload asset (only on tag push)
-        if: startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v1
-        with:
-          # softprops/action-gh-release will use the tag from the workflow ref when run on a tag push
-          files: flutter_app/${{ matrix.artifact_name }}
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload artifact to workflow run (non-tag runs)
-        if: !startsWith(github.ref, 'refs/tags/')
-        uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.artifact_name }}
-          path: flutter_app/${{ matrix.artifact_name }}
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: flutter_app/${{ matrix.artifact_name }}
+          asset_name: ${{ matrix.artifact_name }}
+          asset_content_type: application/zip
