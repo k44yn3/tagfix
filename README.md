@@ -1,4 +1,4 @@
-# TagFix
+# TagFix - Available in Flutter (Dekstop App), CLI & Web Based App
 
 A powerful audio metadata editor supporting FLAC, MP3, M4A, OGG, OPUS, WMA, and WAV formats.
 
