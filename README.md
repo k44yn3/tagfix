@@ -1,17 +1,3 @@
-<<<<<<< HEAD
-# TagFix - Flutter
-
-This is the Flutter port of the TagFix application, supporting Windows, Linux, and macOS.
-
-## Prerequisites
-
-- Flutter SDK installed and in your PATH.
-- `ffmpeg` installed (for audio conversion).
-
-## Setup
-
-Since the project was scaffolded manually, you need to run the following command to generate platform-specific files:
-=======
 # TagFix
 
 A powerful audio metadata editor supporting FLAC, MP3, M4A, OGG, OPUS, WMA, and WAV formats.
@@ -29,12 +15,10 @@ The modern, cross-platform desktop application with a beautiful Material You int
     -   **macOS**: Xcode
 
 ### Building
->>>>>>> e57358e (Remove large FFmpeg binaries from repo)
 
 #### Linux
 ```bash
 cd flutter_app
-<<<<<<< HEAD
 flutter create .
 ```
 
@@ -127,4 +111,3 @@ Start the web server:
 python3 app.py
 ```
 Open your browser and navigate to `http://localhost:5000`.
->>>>>>> e57358e (Remove large FFmpeg binaries from repo)
