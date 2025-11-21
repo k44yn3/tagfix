@@ -1,113 +1,81 @@
-# TagFix - Available in Flutter (Dekstop App), CLI & Web Based App
+# TagFix
 
-A powerful audio metadata editor supporting FLAC, MP3, M4A, OGG, OPUS, WMA, and WAV formats.
+A powerful audio metadata editor supporting FLAC, MP3, M4A, OGG, OPUS, WMA, and WAV formats. Available as a modern Desktop App, CLI tool, and Web Interface.
 
-## 1. Flutter App (Recommended)
+## Download
 
-The modern, cross-platform desktop application with a beautiful Material You interface.
+**[Download the latest release here](https://github.com/k44yn3/tagfix/releases)**
 
-### Prerequisites
-
--   **Flutter SDK**: Install from [flutter.dev](https://flutter.dev/docs/get-started/install)
--   **Build Tools**:
-    -   **Linux**: `sudo apt-get install clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev`
-    -   **Windows**: Visual Studio 2022 with "Desktop development with C++"
-    -   **macOS**: Xcode
-
-### Building
-
-#### Linux
-```bash
-cd flutter_app
-flutter create .
-```
-
-## Running
-
-```bash
-flutter run -d linux  # or windows, macos
-```
+Pre-built binaries are available for:
+- **Windows** (Portable .zip)
+- **Linux** (Portable .zip)
+- **Android** (.apk)
 
 ## Features
 
-- **Material You Design**: Dynamic theming based on seed color.
-- **Cross-Platform**: Runs natively on desktop.
+- **Material Design**: Modern interface with dynamic theming.
 - **Metadata Editing**: Edit Title, Artist, Album, Year, Genre, Track/Disc numbers.
-- **Cover Art**: View and update cover art.
-- **Conversion**: Convert files to WAV or FLAC using system FFmpeg.
-- **Recursive Scanning**: Scan folders for audio files.
+- **Cover Art**: View and update album covers.
+- **Format Conversion**: Convert files to WAV or FLAC.
+- **Recursive Scanning**: Process entire directories at once.
+- **Cross-Platform**: Consistent experience across all supported devices.
 
-## Project Structure
+## Building from Source
 
-- `lib/models`: Data models (`AudioFile`).
-- `lib/services`: Core logic (`FileService`, `TagService`, `FfmpegService`).
-- `lib/providers`: State management (`AppState`).
-- `lib/screens`: UI Screens (`MainScreen`).
-- `lib/widgets`: Reusable widgets (`FileList`, `EditorPanel`, `CoverArtWidget`).
+### Flutter Desktop & Android
 
-=======
+**Prerequisites:**
+- Flutter SDK
+- **Linux**: `sudo apt-get install clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev`
+- **Windows**: Visual Studio 2022 with C++ workload
+
+**Build:**
+```bash
+cd flutter_app
 flutter pub get
+
+# Linux
 flutter build linux --release
-```
-The executable will be in `build/linux/x64/release/bundle/tagfix`.
 
-#### Windows
-```bash
-cd flutter_app
-flutter pub get
+# Windows
 flutter build windows --release
+
+# Android
+flutter build apk --release
 ```
-The executable will be in `build\windows\runner\Release\tagfix.exe`.
 
-#### macOS
-```bash
-cd flutter_app
-flutter pub get
-flutter build macos --release
-```
-The app bundle will be in `build/macos/Build/Products/Release/tagfix.app`.
+### CLI & Web Version
 
----
+**Prerequisites:**
+- Python 3.8+
+- FFmpeg
 
-## 2. CLI Version
-
-The original Python-based command line interface and Tkinter GUI.
-
-### Prerequisites
--   Python 3.8+
--   FFmpeg (for format conversion)
-
-### Installation
+**Installation:**
 ```bash
 pip install -r requirements.txt
 ```
 
-### Usage
-Run the script to open the GUI:
-```bash
-python3 tagfix.py
-```
+**Usage:**
+- **CLI**: `python3 tagfix.py`
+- **Web**: `python3 app.py` (Access at `http://localhost:5000`)
 
-Or import it as a module for scripting.
+## Credits
 
----
+TagFix is built with open-source software:
 
-## 3. Web Version
+**Flutter Packages:**
+- audiotags
+- file_picker
+- provider
+- window_manager
+- path_provider
+- http
+- google_fonts
+- desktop_drop
+- image
 
-A web-based interface for TagFix, perfect for headless servers or remote access.
-
-### Prerequisites
--   Python 3.8+
--   Flask
-
-### Installation
-```bash
-pip install -r requirements.txt
-```
-
-### Usage
-Start the web server:
-```bash
-python3 app.py
-```
-Open your browser and navigate to `http://localhost:5000`.
+**Python Libraries:**
+- Flask
+- mutagen
+- Pillow
+- requests
