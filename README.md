@@ -14,12 +14,11 @@ Pre-built binaries are available for:
 
 ## Features
 
-- **Material Design**: Modern interface with dynamic theming.
 - **Metadata Editing**: Edit Title, Artist, Album, Year, Genre, Track/Disc numbers.
-- **Cover Art**: View and update album covers.
+- **Cover Art**: Update album covers(Local/Online).
 - **Format Conversion**: Convert files to WAV or FLAC.
 - **Recursive Scanning**: Process entire directories at once.
-- **Cross-Platform**: Consistent experience across all supported devices.
+- **Lyrics Embedding**: Embed lyrics into audio files(Local/Online).
 
 ## Building from Source
 
@@ -60,6 +59,6 @@ pip install -r requirements.txt
 ## Credits
 
 - Flutter
-- FFmpeg
-- MusicBrainz
-- Lrclib
+- FFmpeg for format conversion
+- MusicBrainz for online covers fetching
+- Lrclib for online lyrics fetching
