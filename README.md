@@ -1,1 +1,2 @@
-download .zip and run ```python main.py```
+moved from flutter to python.
+download .zip and run ```python main.py```.
